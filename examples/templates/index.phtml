@@ -1,0 +1,14 @@
+<html>
+	<head>
+		<title><?= $this->pageTitle ?></title>
+	</head>
+	<body>
+		<header>
+			<nav>
+				<?php foreach($this->tabs as $link => $label) { ?>
+					<navitem url="<?= $link ?>"><?= $label ?></navitem>
+				<?php } ?>
+			</nav>
+		</header>
+	</body>
+</html>
