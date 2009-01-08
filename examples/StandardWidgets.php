@@ -249,7 +249,7 @@ class StandardWidgets {
 		
 	}
 	
-	public static function checkboxesTag ($args = array()) {
+	public static function checkboxTag ($args = array()) {
 		
 	}
 	
