@@ -371,18 +371,22 @@ class Toasty {
 					$scriptString = '';
 					
 					foreach($this->scriptBlocks as $key => $code) {
-						$scriptString .= "// start block ".$key."\n\n". strip_tags($code) . "\n\n// end block ".$key." \n\n";
+						// determine if the script block is a src=" block.  do the regular thing if it is. Let's regex this soonish.
+						if (strstr($code, 'src="') == false) {
+							$scriptString .= "// start block ".$key."\n\n". strip_tags($code) . "\n\n// end block ".$key." \n\n";
+							$output = str_replace('<script block="'.$this->hashNumber($key).'"/>', '', $output);
+							$output = str_replace('<script block="'.$this->hashNumber($key).'"></script>', '', $output);
+						} else {
+							$output = str_replace('<script block="'.$this->hashNumber($key).'"/>', $code, $output);
+							$output = str_replace('<script block="'.$this->hashNumber($key).'"></script>', $code, $output);
+						}
 					}
 					
 					foreach($this->styleBlocks as $key => $style) {
 						$styleString .= "/* start block ".$key." */\n\n". strip_tags($style) . "\n\n/* end block ".$key." */\n\n";
+						$output = str_replace('<style block="'.$this->hashNumber($key).'"/>', '', $output);
+						$output = str_replace('<style block="'.$this->hashNumber($key).'"></style>', '', $output);
 					}
-					
-					// replace the script and style tags with nothing
-					$output = str_replace('<script block="'.$this->hashNumber($key).'"/>', '', $output);
-					$output = str_replace('<script block="'.$this->hashNumber($key).'"></script>', '', $output);	
-					$output = str_replace('<style block="'.$this->hashNumber($key).'"/>', '', $output);
-					$output = str_replace('<style block="'.$this->hashNumber($key).'"></style>', '', $output);	
 					
 					if ($this->createFiles) {
 						// save the scripts and styles to external files, write these to the script and style tag locations, if specified
