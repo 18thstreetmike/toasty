@@ -81,18 +81,18 @@ class StandardWidgets {
 		$retval .= "
 			<script>
 				activeTab = ".($args['current'] ? "tabs.indexOf('".$args['current']."')" : '0').";
-				Ext.onReady(function(){
-				    var tabpanel = new Ext.TabPanel({
-				        renderTo: '".$args['id']."',
-				        width: ".$args['width'].",
-				        ".($args['height'] && is_numeric($args['height']) ? "height: ".$args['height']."," : '')."
-				        activeTab: activeTab,
-				        ".($args['frame'] && $args['frame'] == 'true' ? "frame:true," : "frame:false,")." ,
-				        ".($args['hideborders'] && $args['hideborders'] == 'true' ? "hideBorders:true," : "hideBorders:false,")." ,
-				        ".($args['autoheight'] && $args['autoheight'] == 'true' ? 'defaults:{autoHeight: true},' : '')."
-				        items:tabContent
-				    });
-				});
+				
+			    var tabpanel = new Ext.TabPanel({
+			        renderTo: '".$args['id']."',
+			        width: ".$args['width'].",
+			        ".($args['plain'] && $args['plain'] == 'false' ? "plain:false," : "plain:true,")."
+			        ".($args['height'] && is_numeric($args['height']) ? "height: ".$args['height']."," : '')."
+			        activeTab: activeTab,
+			        ".($args['frame'] && $args['frame'] == 'true' ? "frame:true," : "frame:false,")."
+			        ".($args['hideborders'] && $args['hideborders'] == 'true' ? "hideBorders:true," : "hideBorders:false,")."
+			        ".($args['autoheight'] && $args['autoheight'] == 'true' ? 'defaults:{autoHeight: true},' : '')."
+			        items: tabContent
+			    });
 			</script>
 		";
 		return $retval;
@@ -116,8 +116,12 @@ class StandardWidgets {
 		$retval = '
 			<script>
 				htmlCode'.preg_replace('/[.:-]/', '_', $args['id']).' = html_entity_decode(\''.htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent))).'\');
-				tabs[] = "'.$args['id'].'";
-				tabContent[] = {title:\''.str_replace("'", "\\'",$args['label']).'\',html: htmlCode'.preg_replace('/[.:-]/', '_', $args['id']).'};
+				tabs[tabs.length] = "'.$args['id'].'";
+				tabContent[tabContent.length] = {
+					title:\''.str_replace("'", "\\'",$args['label']).'\',
+					html: htmlCode'.preg_replace('/[.:-]/', '_', $args['id']).',
+					cls: "tab-heading"
+				};
 			</script>
 		';
 		return $retval;
@@ -149,7 +153,7 @@ class StandardWidgets {
 		}
 		die;*/
 		$retval = '<div id="'.$args['id'].'"'.$attributes.'></div><script>htmlCode'.preg_replace('/[.:-]/', '_', $args['id']).' = html_entity_decode(\''.htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent))).'\'); ';
-		$retval .= "Ext.onReady(function(){
+		$retval .= "
 					    var p = new Ext.Panel({
 					        title: '".htmlentities($args['label'])."',
 					        ".($args['collapsible'] && $args['collapsible'] == 'true' ? 'collapsible:true,' : 'collapsible: false,')."
@@ -157,7 +161,7 @@ class StandardWidgets {
 					        width:".$args['width'].",
 					        html: htmlCode".preg_replace('/[.:-]/', '_', $args['id'])." 
 					    });
-					});";
+					";
 		$retval .= '</script>';
 		return $retval;
 	}
