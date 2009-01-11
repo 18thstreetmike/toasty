@@ -1,14 +1,61 @@
 <html>
 	<head>
 		<title><?= $this->pageTitle ?></title>
+		<script type="text/javascript" src="scripts/php/php.js"></script> 
+        <script type="text/javascript" src="scripts/ext-2.2/adapter/ext/ext-base.js"></script> 
+        <script type="text/javascript" src="scripts/ext-2.2/ext-all-debug.js"></script>
+        <link href="styles/ext-2.2/css/ext-all.css" media="screen" rel="stylesheet" type="text/css"/> 
+        <link href="styles/reset.css" media="screen" rel="stylesheet" type="text/css"/> 
+        <link href="styles/style.css" media="screen" rel="stylesheet" type="text/css"/>
+        <scriptgroup />
+		<stylegroup />
 	</head>
 	<body>
 		<header>
+			<banner title="Sample Application Page" subtitle="Version 1.0" />
 			<nav>
 				<?php foreach($this->tabs as $link => $label) { ?>
 					<navitem url="<?= $link ?>"><?= $label ?></navitem>
 				<?php } ?>
 			</nav>
+			<subnav>
+				<?php foreach($this->subnavtabs as $link => $label) { ?>
+					<navitem url="<?= $link ?>"><?= $label ?></navitem>
+				<?php } ?>
+			</subnav>
 		</header>
+		<content>
+			<panel label="" id="panel1">
+				<h3>Hi!</h3>
+				<p>
+					Here is some content 1.
+				</p>
+			</panel>
+			<br />
+			<p>text</p>
+			<tabs default="tab1">
+				<tab label="Tab 1" id="tab1">
+					<h3>Hi!</h3>
+					<p>
+						Here is some content.
+					</p>
+				</tab>
+				<tab label="Tab 2" id="tab2">
+					<h3>Hi!</h3>
+					<p>
+						Here is some content 2.
+					</p>
+				</tab>
+				<tab label="Tab 3" id="tab3">
+					<h3>Hi!</h3>
+					<p>
+						Here is some content 3.
+					</p>
+				</tab>
+			</tabs>
+		</content>
+		<footer>
+		
+		</footer>
 	</body>
 </html>
