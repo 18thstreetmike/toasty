@@ -1,6 +1,7 @@
 <?php
 
 class StandardWidgets {
+	
 	public static function navContainer($args = array(), $innerContent = '') {
 		$attributes = '';
 		foreach ($args as $name => $value) {
@@ -73,25 +74,25 @@ class StandardWidgets {
 		}
 		$retval = '
 			<script>
-				tabs = new Array();
-				tabContent = new Array();
+				stdWidgetTabs = new Array();
+				stdWidgetTabContent = new Array();
 			</script>
 		';
 		$retval .= '<div class="tabs'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</div>';
 		$retval .= "
 			<script>
-				activeTab = ".($args['current'] ? "tabs.indexOf('".$args['current']."')" : '0').";
+				stdWidgetActiveTab = ".($args['current'] ? "stdWidgetTabs.indexOf('".$args['current']."')" : '0').";
 				
-			    var tabpanel = new Ext.TabPanel({
+			    new Ext.TabPanel({
 			        renderTo: '".$args['id']."',
 			        width: ".$args['width'].",
 			        ".($args['plain'] && $args['plain'] == 'false' ? "plain:false," : "plain:true,")."
 			        ".($args['height'] && is_numeric($args['height']) ? "height: ".$args['height']."," : '')."
-			        activeTab: activeTab,
+			        activeTab: stdWidgetActiveTab,
 			        ".($args['frame'] && $args['frame'] == 'true' ? "frame:true," : "frame:false,")."
 			        ".($args['hideborders'] && $args['hideborders'] == 'true' ? "hideBorders:true," : "hideBorders:false,")."
 			        ".($args['autoheight'] && $args['autoheight'] == 'true' ? 'defaults:{autoHeight: true},' : '')."
-			        items: tabContent
+			        items: stdWidgetTabContent
 			    });
 			</script>
 		";
@@ -113,17 +114,16 @@ class StandardWidgets {
 				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
 			}
 		}
-		$retval = '
+		$retval = "
 			<script>
-				htmlCode'.preg_replace('/[.:-]/', '_', $args['id']).' = html_entity_decode(\''.htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent))).'\');
-				tabs[tabs.length] = "'.$args['id'].'";
-				tabContent[tabContent.length] = {
-					title:\''.str_replace("'", "\\'",$args['label']).'\',
-					html: htmlCode'.preg_replace('/[.:-]/', '_', $args['id']).',
-					cls: "tab-heading"
+				stdWidgetTabs[stdWidgetTabs.length] = '".$args['id']."';
+				stdWidgetTabContent[stdWidgetTabContent.length] = {
+					title:'".str_replace("'", "\\'",$args['label'])."',
+					html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."'),
+					cls: 'tab-heading'
 				};
 			</script>
-		';
+		";
 		return $retval;
 	}
 	
@@ -138,37 +138,100 @@ class StandardWidgets {
 		if (!$args['width']) {
 			$args['width'] = '300';
 		}
-		$reservedAttributes = array('id','label', 'width', 'collapsible');
+		if (!$args['embed'] || !$args['embed'] == 'true') {
+			$args['embed'] = false;
+		} else {
+			$args['embed'] = true;
+		}
+		$reservedAttributes = array('id','label', 'width', 'collapsible', 'embed');
 		$attributes = '';
 		foreach ($args as $name => $value) {
 			if (!in_array($name, $reservedAttributes)) {
 				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
 			}
 		}
-		//echo str_replace("\t", '', str_replace("\n", '', $innerContent)); die;
-		/*
-		echo $fixedString.'<br />';
-		for($i = 0; $i < strlen($fixedString); $i++) {
-			echo ord(substr($fixedString, $i, 1)).' ';
-		}
-		die;*/
-		$retval = '<div id="'.$args['id'].'"'.$attributes.'></div><script>htmlCode'.preg_replace('/[.:-]/', '_', $args['id']).' = html_entity_decode(\''.htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent))).'\'); ';
-		$retval .= "
-					    var p = new Ext.Panel({
+		
+		if (!$args['embed']) {
+			$retval = '<div id="'.$args['id'].'"'.$attributes.'></div><script>';
+			$retval .= "    new Ext.Panel({
 					        title: '".htmlentities($args['label'])."',
 					        ".($args['collapsible'] && $args['collapsible'] == 'true' ? 'collapsible:true,' : 'collapsible: false,')."
 					        renderTo: '".$args['id']."',
 					        width:".$args['width'].",
-					        html: htmlCode".preg_replace('/[.:-]/', '_', $args['id'])." 
-					    });
+					        html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."') 
+					    })
 					";
-		$retval .= '</script>';
+			$retval .= ';</script>';
+        } else {
+			$retval .= "  ,{
+					        title: '".htmlentities($args['label'])."',
+					        ".($args['collapsible'] && $args['collapsible'] == 'true' ? 'collapsible:true,' : 'collapsible: false,')."
+					        width:".$args['width'].",
+					        html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."') 
+					    }
+					";
+		}
+		
 		return $retval;
 	}
 	
 	public static function dashboardContainer($args = array(), $innerContent = '') {
-		
+		if (!$args['id']) {
+			$args['id'] = 'dashboard-'.time();
+		}
+		$reservedAttributes = array('id','margins');
+		$attributes = '';
+		foreach ($args as $name => $value) {
+			if (!in_array($name, $reservedAttributes)) {
+				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
+			}
+		}
+		$retval .= '<div id="'.$args['id'].'"'.$attributes.'></div>';
+		$retval .= '<script>'."\n";
+		$retval .= 'var stdWidgetColumns = new Array();'."\n";
+		$retval .= '</script>'."\n";
+		$retval .= $innerContent;
+		$retval .= "<script>\n";
+		$retval .= "
+			new Ext.Panel({
+				cls: 'dashboard',
+				renderTo: '".$args['id']."',
+				autoHeight: true,
+				border: false,
+				items: [{
+					xtype:'portal',
+					".($args['margins'] ? "margins:'".str_replace("'", "\\'", $args['margins'])."'," : '')." 
+					items: stdWidgetColumns
+				}]
+			});
+			stdWidgetColumns = new Array();
+		";
+		$retval .= '</script>';
+		return $retval;
 	}
+	
+	public static function columnContainer($args = array(), $innerContent = '') {
+		if (!$args['width'] || !is_numeric($args['width'])) {
+			$args['width'] = '1';
+		}
+		$retval = "
+			<script>
+				var stdWidgetColumnElements = new Array();
+				stdWidgetColumnElements = [ false
+					".$innerContent."
+				];
+				stdWidgetColumnElements.shift();
+				stdWidgetColumns[stdWidgetColumns.length] = {
+					border: false,
+					columnWidth: ".$args['width'].",
+					".($args['style'] ? "style: '".str_replace("'", "\\'", $args['style'])."'," : '')."
+					items: stdWidgetColumnElements
+				};
+				var stdWidgetColumnElements = new Array();
+			</script>
+		";
+		return $retval;
+    }
 	
 	public static function treeObject($args = array(), $innerXML = '') {
 		

@@ -1,13 +1,12 @@
 <html>
 	<head>
 		<title><?= $this->pageTitle ?></title>
-		<script type="text/javascript" src="scripts/php/php.js"></script> 
-        <script type="text/javascript" src="scripts/ext-2.2/adapter/ext/ext-base.js"></script> 
-        <script type="text/javascript" src="scripts/ext-2.2/ext-all-debug.js"></script>
-        <link href="styles/ext-2.2/css/ext-all.css" media="screen" rel="stylesheet" type="text/css"/> 
-        <link href="styles/reset.css" media="screen" rel="stylesheet" type="text/css"/> 
-        <link href="styles/style.css" media="screen" rel="stylesheet" type="text/css"/>
-        <scriptgroup />
+		<script type="text/javascript" src="scripts/StandardWidgets.js"></script> 
+		<link href="styles/ext-2.2/css/ext-all.css" media="screen" rel="stylesheet" type="text/css"/>
+		<link href="styles/ext-2.2/portal.css" media="screen" rel="stylesheet" type="text/css"/> 
+		<link href="styles/reset.css" media="screen" rel="stylesheet" type="text/css"/> 
+		<link href="styles/style.css" media="screen" rel="stylesheet" type="text/css"/>
+		<scriptgroup />
 		<stylegroup />
 	</head>
 	<body>
@@ -53,6 +52,32 @@
 					</p>
 				</tab>
 			</tabs>
+			<dashboard style="width: 50%; margin-top: 10px;">
+				<column width=".3333">
+					<panel label="Panel 1" id="panel2" embed="true" collapsible="true">
+						<h3>Hi!</h3>
+						<p>
+							Here is some content 1.
+						</p>
+					</panel>
+				</column>
+				<column width=".3333">
+					<panel label="Panel 2" id="panel3" embed="true" collapsible="true">
+						<h3>Hi!</h3>
+						<p>
+							Here is some content 2.
+						</p>
+					</panel>
+				</column>
+				<column width=".3333">
+					<panel label="Panel 3" id="panel4" embed="true" collapsible="true">
+						<h3>Hi!</h3>
+						<p>
+							Here is some content 3.
+						</p>
+					</panel>
+				</column>
+			</dashboard>
 		</content>
 		<footer>
 		

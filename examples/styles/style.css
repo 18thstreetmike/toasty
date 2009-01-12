@@ -1,0 +1,116 @@
+/* element definitions */
+body {
+	text-align: center;
+	font-family: Tahoma, Arial, san-serif;
+	font-size: 10pt;
+	line-height: 120%;
+}
+
+p {
+	text-indent: 1em;
+	padding: .25em;	
+}
+
+ul {
+	padding: .5em;
+	list-style-type: disc;	
+}
+
+li {
+	margin-left: 2em;
+}
+
+a {
+	color: black;
+}
+
+/* chrome definitions */
+div.header {
+	width: 90%;
+	text-align: left;
+	margin: 1em auto;
+	border-bottom: 1px solid #8694A8;
+}
+
+div.banner {
+	float: left;
+	padding: 1em;	
+}
+
+div.banner h1 {
+	font-size: 16pt;
+}
+div.banner h3 {
+	font-size: 12pt;
+	font-weight: normal;
+}
+
+ul.nav {
+	float: right;
+	margin-top: 3em;
+	list-style-type: none;
+	padding: 0;	
+}
+
+ul.nav li {
+	float: left;
+	margin-right: .5em;
+	margin-left: 0;
+	padding: 0.5em;
+	border: 1px solid #8694A8;
+	-moz-border-radius-topright: 0.5em;
+	-moz-border-radius-topleft: 0.5em;
+  	border-top-right-radius: 0.5em;
+  	border-top-left-radius: 0.5em;
+	border-bottom-width: 0px;
+	background-color: #BFD3F0;	
+}
+
+ul.nav li a {
+	font-weight: bold;
+}
+
+ul.nav li.current-nav {
+	background-color: #E5F0FF;	
+}
+
+ul.subnav {
+	clear: both;
+	float: left;
+	width: 100%;
+	border-top: 1px solid #8694A8;
+	background-color: #BFD3F0;	
+	list-style-type: none;
+	padding: 0;
+}
+
+ul.subnav li {
+	float: left;
+	margin-right: .5em;
+	margin-left: 0;
+	padding: 0.5em;	
+}
+
+ul.subnav li a {
+	font-weight: bold;
+}
+
+ul.subnav li.current-subnav {
+	background-color: #E5F0FF;	
+}
+
+div.tabs ul {
+	padding: 0em;
+	list-style-type: none;	
+}
+
+/* content definitions */
+div.content {
+	width: 90%;
+	text-align: left;
+	margin: 1em auto;
+}
+
+br.clearer {
+	clear:both;
+}
