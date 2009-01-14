@@ -104,6 +104,16 @@ div.tabs ul {
 	list-style-type: none;	
 }
 
+div.x-tree ul {
+	padding: 0em;
+	margin: 0em;
+	list-style-type: none;
+}
+div.x-tree ul li {
+	padding: 0em;
+	margin: 0em;
+}
+
 /* content definitions */
 div.content {
 	width: 90%;

@@ -269,7 +269,7 @@ class StandardWidgets {
 			}
 
 			// do all of the parts that aren't node specific
-			foreach ($child->attributes as $name => $value) {
+			foreach ($child->attributes() as $name => $value) {
 				switch ($name) {
 					case 'class':
 						$className = $value;
@@ -312,8 +312,30 @@ class StandardWidgets {
 		$itemsString .= ']';
 
 		$retval .= "
+			var Tree = Ext.tree;
 
+			var tree = new Tree.TreePanel({
+				el:'".$args['id']."',
+				useArrows:true,
+				".($args['class'] ? 'cls: '.$args['class'].',' : '')."
+				autoScroll:true,
+				animate:true,
+				enableDD:true,
+				containerScroll: true,
+				rootVisible:false,
+				root: {
+					text: 'Root',
+					draggable:false,
+					id:'source',
+					children:".$itemsString."
+				}
+			});
+
+			// render the tree
+			tree.render();
+			</script>
 		";
+		return $retval;
 	}
 
 	public static function treeRecursionHelper($node) {
@@ -336,7 +358,7 @@ class StandardWidgets {
 			}
 
 			// do all of the parts that aren't node specific
-			foreach ($child->attributes as $name => $value) {
+			foreach ($child->attributes() as $name => $value) {
 				switch ($name) {
 					case 'class':
 						$className = $value;
