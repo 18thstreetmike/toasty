@@ -143,7 +143,7 @@ class StandardWidgets {
 		} else {
 			$args['embed'] = true;
 		}
-		$reservedAttributes = array('id','label', 'width', 'collapsible', 'embed');
+		$reservedAttributes = array('id','label', 'width', 'collapsible', 'embed', 'class');
 		$attributes = '';
 		foreach ($args as $name => $value) {
 			if (!in_array($name, $reservedAttributes)) {
@@ -156,7 +156,8 @@ class StandardWidgets {
 			$retval .= "    new Ext.Panel({
 					        title: '".htmlentities($args['label'])."',
 					        ".($args['collapsible'] && $args['collapsible'] == 'true' ? 'collapsible:true,' : 'collapsible: false,')."
-					        renderTo: '".$args['id']."',
+					        ".($args['class'] ? "cls: '".str_replace("'", "\\'", $args['class'])."'," : '')."
+                                                renderTo: '".$args['id']."',
 					        width:".$args['width'].",
 					        html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."') 
 					    })
@@ -166,7 +167,8 @@ class StandardWidgets {
 			$retval .= "  ,{
 					        title: '".htmlentities($args['label'])."',
 					        ".($args['collapsible'] && $args['collapsible'] == 'true' ? 'collapsible:true,' : 'collapsible: false,')."
-					        width:".$args['width'].",
+                                                ".($args['class'] ? "cls: '".str_replace("'", "\\'", $args['class'])."'," : '')."
+                                                width:".$args['width'].",
 					        html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."') 
 					    }
 					";
@@ -222,7 +224,9 @@ class StandardWidgets {
 				];
 				stdWidgetColumnElements.shift();
 				stdWidgetColumns[stdWidgetColumns.length] = {
-					border: false,
+                                        ".($args['id'] ? "id: '".str_replace("'", "\\'", $args['id'])."'," : '')."
+					".($args['class'] ? "cls: '".str_replace("'", "\\'", $args['class'])."'," : '')."
+                                        border: false,
 					columnWidth: ".$args['width'].",
 					".($args['style'] ? "style: '".str_replace("'", "\\'", $args['style'])."'," : '')."
 					items: stdWidgetColumnElements
@@ -234,7 +238,145 @@ class StandardWidgets {
     }
 	
 	public static function treeObject($args = array(), $innerXML = '') {
-		
+		if (!$args['id']) {
+			$args['id'] = 'tree-'.time();
+		}
+		$reservedAttributes = array('id','class');
+		$attributes = '';
+		foreach ($args as $name => $value) {
+			if (!in_array($name, $reservedAttributes)) {
+				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
+			}
+		}
+		$retval = '<div id="'.$args['id'].'"'.$attributes.'></div>'."\n".'<script>'."\n";
+		$xml = new SimpleXMLElement($innerXML);
+		$itemsString = '[';
+		$firstFlag = true;
+		foreach ($xml->children() as $child) {
+			if ($firstFlag) {
+				$firstFlag = false;
+			} else {
+				$itemsString .= ',';
+			}
+
+			// initialize based on node type
+			if ($child->getName() == 'leaf') {
+				$itemsString .= '{leaf:true';
+				$className = 'tree-leaf';
+			} else {
+				$itemsString .= '{leaf:false';
+				$className = 'tree-branch';
+			}
+
+			// do all of the parts that aren't node specific
+			foreach ($child->attributes as $name => $value) {
+				switch ($name) {
+					case 'class':
+						$className = $value;
+						break;
+					case 'id':
+						$itemsString .= ",id:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'href':
+						$itemsString .= ",href:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'target':
+						$itemsString .= ",hrefTarget:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'icon':
+						$itemsString .= ",icon:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'label':
+						$itemsString .= ",text:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'title':
+						$itemsString .= ",qtip:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'disabled':
+						$itemsString .= ",disabled:".($value == "true" ? 'true' : 'false');
+						break;
+					case 'onclick':
+						$itemsString .= ",listeners:{'click':function(){".$value."},scope:this}";
+						break;
+				}
+			}
+			$itemsString .= ",cls:'".$className."'";
+			
+			// finalize based on node type
+			if ($child->getName() == 'leaf') {
+				$itemsString .= '}';
+			} else {
+				$itemsString .= ',children:['.self::treeRecursionHelper($child).']}';
+			}
+		}
+		$itemsString .= ']';
+
+		$retval .= "
+
+		";
+	}
+
+	public static function treeRecursionHelper($node) {
+		$itemsString = '';
+		$firstFlag = true;
+		foreach ($node->children() as $child) {
+			if ($firstFlag) {
+				$firstFlag = false;
+			} else {
+				$itemsString .= ',';
+			}
+
+			// initialize based on node type
+			if ($child->getName() == 'leaf') {
+				$itemsString .= '{leaf:true';
+				$className = 'tree-leaf';
+			} else {
+				$itemsString .= '{leaf:false';
+				$className = 'tree-branch';
+			}
+
+			// do all of the parts that aren't node specific
+			foreach ($child->attributes as $name => $value) {
+				switch ($name) {
+					case 'class':
+						$className = $value;
+						break;
+					case 'id':
+						$itemsString .= ",id:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'href':
+						$itemsString .= ",href:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'target':
+						$itemsString .= ",hrefTarget:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'icon':
+						$itemsString .= ",icon:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'label':
+						$itemsString .= ",text:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'title':
+						$itemsString .= ",qtip:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'disabled':
+						$itemsString .= ",disabled:".($value == "true" ? 'true' : 'false');
+						break;
+					case 'onclick':
+						$itemsString .= ",listeners:{'click':function(){".$value."},scope:this}";
+						break;
+				}
+			}
+			$itemsString .= ",cls:'".$className."'";
+
+			// finalize based on node type
+			if ($child->getName() == 'leaf') {
+				$itemsString .= '}';
+			} else {
+				$itemsString .= ',children:['.self::treeRecursionHelper($child).']}';
+			}
+		}
+		return $itemsString;
 	}
 	
 	public static function gridObject($args = array(), $innerXML = '') {
