@@ -402,7 +402,18 @@ class StandardWidgets {
 	}
 	
 	public static function gridObject($args = array(), $innerXML = '') {
-		
+		if (!$args['id']) {
+			$args['id'] = 'grid-'.time();
+		}
+		$reservedAttributes = array('id','class');
+		$attributes = '';
+		foreach ($args as $name => $value) {
+			if (!in_array($name, $reservedAttributes)) {
+				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
+			}
+		}
+		$retval = '<div id="'.$args['id'].'"'.$attributes.'></div>'."\n".'<script>'."\n";
+		$xml = new SimpleXMLElement($innerXML);
 	}
 	
 	public static function filterContainer($args = array(), $innerContent = '') {
