@@ -1,14 +1,21 @@
 <?php
 
 class StandardWidgets {
+
+	private static function getAdditionalAttributes($args = array(), $reservedAttributes = array())
+	{
+		$attributes = '';
+                foreach ($args as $name => $value) {
+                        if (!in_array($name, $reservedAttributes)) {
+                                $attributes .= ' '.$name.'="'.htmlentities($value).'"';
+                        }
+                }
+
+		return $attributes;
+	}
 	
 	public static function navContainer($args = array(), $innerContent = '') {
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if ($name != 'class') {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, array('class'));
 		return '<ul class="nav'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</ul>';
 	}
 	
@@ -22,38 +29,27 @@ class StandardWidgets {
 				$args['class'] = 'current-nav';
 			}
 		}
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+
+		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
+
 		return '<li'.$attributes.'>'.(isset($args['url']) ? '<a href="'.htmlentities($args['url']).'">' : '').$innerContent.(isset($args['url']) ? '</a>' : '').'</li>';
 	}
 	
 	public static function subnavContainer($args = array(), $innerContent = '') {
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if ($name != 'class') {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, array('class'));
 		return '<ul class="subnav'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</ul>';
 	}
 	
 	public static function bannerTag ($args = array()) {
 		$reservedAttributes = array('class', 'src', 'title', 'subtitle');
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
+
 		if (isset($args['src']) && file_exists($_SERVER['DOCUMENT_ROOT'].$args['src'])) {
 			$showImage = true;	
 		} else {
 			$showImage = false;
 		}
+
 		return '<div class="banner'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.($showImage ? '<img src="'.htmlentities($args['src']).'" alt="'.(isset($args['title']) ? htmlentities($args['title']) : 'Logo').'" />' : '').(isset($args['title']) ? '<h1>'.htmlentities($args['title']).'</h1>' : '').(isset($args['subtitle']) ? '<h2>'.htmlentities($args['subtitle']).'</h2>' : '').'</div>';
 	}
 	
@@ -66,12 +62,8 @@ class StandardWidgets {
 			$args['width'] = '300';
 		}
 		$reservedAttributes = array('class', 'width', 'height', 'autoheight', 'current', 'frame', 'hideborders');
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
+
 		$retval = '
 			<script>
 				stdWidgetTabs = new Array();
@@ -108,12 +100,8 @@ class StandardWidgets {
 			$args['label'] = 'My Tab';
 		}
 		$reservedAttributes = array('id', 'label');
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
+
 		$retval = "
 			<script>
 				stdWidgetTabs[stdWidgetTabs.length] = '".$args['id']."';
@@ -144,13 +132,8 @@ class StandardWidgets {
 			$args['embed'] = true;
 		}
 		$reservedAttributes = array('id','label', 'width', 'collapsible', 'embed', 'class');
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
-		
+		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
+
 		if (!$args['embed']) {
 			$retval = '<div id="'.$args['id'].'"'.$attributes.'></div><script>';
 			$retval .= "    new Ext.Panel({
@@ -182,12 +165,8 @@ class StandardWidgets {
 			$args['id'] = 'dashboard-'.time();
 		}
 		$reservedAttributes = array('id','margins');
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
+
 		$retval .= '<div id="'.$args['id'].'"'.$attributes.'></div>';
 		$retval .= '<script>'."\n";
 		$retval .= 'var stdWidgetColumns = new Array();'."\n";
@@ -242,12 +221,8 @@ class StandardWidgets {
 			$args['id'] = 'tree-'.time();
 		}
 		$reservedAttributes = array('id','class');
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
+
 		$retval = '<div id="'.$args['id'].'"'.$attributes.'></div>'."\n".'<script>'."\n";
 		$xml = new SimpleXMLElement($innerXML);
 		$itemsString = '[';
@@ -406,42 +381,26 @@ class StandardWidgets {
 	}
 	
 	public static function filterContainer($args = array(), $innerContent = '') {
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if ($name != 'class') {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, array('class'));
+
 		return '<div class="filter'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
 	public static function headerContainer($args = array(), $innerContent = '') {
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if ($name != 'class') {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, array('class'));
+
 		return '<div class="header'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
 	public static function footerContainer($args = array(), $innerContent = '') {
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if ($name != 'class') {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, array('class'));
+
 		return '<div class="footer'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
 	public static function contentContainer($args = array(), $innerContent = '') {
-		$attributes = '';
-		foreach ($args as $name => $value) {
-			if ($name != 'class') {
-				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
-			}
-		}
+		$attributes = self::getAdditionalAttributes($args, array('class'));
+
 		return '<div class="content'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
