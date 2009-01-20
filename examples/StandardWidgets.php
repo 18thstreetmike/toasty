@@ -16,7 +16,7 @@ class StandardWidgets {
 	
 	public static function navContainer($args = array(), $innerContent = '') {
 		$attributes = self::getAdditionalAttributes($args, array('class'));
-		return '<ul class="nav'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</ul>';
+		return '<ul class="nav'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</ul>';
 	}
 	
 	public static function navitemContainer($args = array(), $innerContent = '') {
@@ -37,7 +37,7 @@ class StandardWidgets {
 	
 	public static function subnavContainer($args = array(), $innerContent = '') {
 		$attributes = self::getAdditionalAttributes($args, array('class'));
-		return '<ul class="subnav'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</ul>';
+		return '<ul class="subnav'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</ul>';
 	}
 	
 	public static function bannerTag ($args = array()) {
@@ -50,7 +50,7 @@ class StandardWidgets {
 			$showImage = false;
 		}
 
-		return '<div class="banner'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.($showImage ? '<img src="'.htmlentities($args['src']).'" alt="'.(isset($args['title']) ? htmlentities($args['title']) : 'Logo').'" />' : '').(isset($args['title']) ? '<h1>'.htmlentities($args['title']).'</h1>' : '').(isset($args['subtitle']) ? '<h2>'.htmlentities($args['subtitle']).'</h2>' : '').'</div>';
+		return '<div class="banner'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.($showImage ? '<img src="'.htmlentities($args['src']).'" alt="'.(isset($args['title']) ? htmlentities($args['title']) : 'Logo').'" />' : '').(isset($args['title']) ? '<h1>'.htmlentities($args['title']).'</h1>' : '').(isset($args['subtitle']) ? '<h2>'.htmlentities($args['subtitle']).'</h2>' : '').'</div>';
 	}
 	
 	public static function tabsContainer($args = array(), $innerContent = '') {
@@ -70,7 +70,7 @@ class StandardWidgets {
 				stdWidgetTabContent = new Array();
 			</script>
 		';
-		$retval .= '<div class="tabs'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</div>';
+		$retval .= '<div class="tabs'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</div>';
 		$retval .= "
 			<script>
 				stdWidgetActiveTab = ".($args['current'] ? "stdWidgetTabs.indexOf('".$args['current']."')" : '0').";
@@ -383,25 +383,25 @@ class StandardWidgets {
 	public static function filterContainer($args = array(), $innerContent = '') {
 		$attributes = self::getAdditionalAttributes($args, array('class'));
 
-		return '<div class="filter'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
+		return '<div class="filter'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
 	public static function headerContainer($args = array(), $innerContent = '') {
 		$attributes = self::getAdditionalAttributes($args, array('class'));
 
-		return '<div class="header'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
+		return '<div class="header'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
 	public static function footerContainer($args = array(), $innerContent = '') {
 		$attributes = self::getAdditionalAttributes($args, array('class'));
 
-		return '<div class="footer'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
+		return '<div class="footer'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
 	public static function contentContainer($args = array(), $innerContent = '') {
 		$attributes = self::getAdditionalAttributes($args, array('class'));
 
-		return '<div class="content'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
+		return '<div class="content'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'<br class="clearer" /></div>';
 	}
 	
 	public static function layoutContainer($args = array(), $innerContent = '') {
@@ -419,13 +419,13 @@ class StandardWidgets {
 	public static function textTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
-		return '<label for="'.$args['id'].'">&nbsp;<input type="text" class="form-text'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
+		return '<label for="'.$args['id'].'">&nbsp;<input type="text" class="form-text'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
 	}
 	
 	public static function passwordTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
-		return '<label for="'.$args['id'].'">&nbsp;<input type="password" class="form-password'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
+		return '<label for="'.$args['id'].'">&nbsp;<input type="password" class="form-password'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
 		
 	}
 	
@@ -436,26 +436,26 @@ class StandardWidgets {
 	public static function selectContainer($args = array(), $innerContent = '') {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('label', 'class'));
-		return '<label for="'.$args['id'].'">&nbsp;<select class="form-select'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</select>';
+		return '<label for="'.$args['id'].'">&nbsp;<select class="form-select'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</select>';
 	}
 	
 	public static function optionContainer($args = array(), $innerContent = '') {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('class'));
-		return '<option class="form-option'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</option>';
+		return '<option class="form-option'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</option>';
 	}
 
 	public static function fileTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
-		return '<label for="'.$args['id'].'">&nbsp;<input type="file" class="form-file'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
+		return '<label for="'.$args['id'].'">&nbsp;<input type="file" class="form-file'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
 		
 	}
 	
 	public static function checkboxTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
-		return '<input type="checkbox" class="form-checkbox'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'/>&nbsp;<label for="'.$args['id'].'">';
+		return '<input type="checkbox" class="form-checkbox'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'/>&nbsp;<label for="'.$args['id'].'">';
 		
 	}
 	
@@ -471,19 +471,19 @@ class StandardWidgets {
 	public static function textareaContainer($args = array(), $innerContent = '') {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('class'));
-		return '<textarea class="form-textarea'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</textarea>';
+		return '<textarea class="form-textarea'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</textarea>';
 	}
 	
 	public static function submitTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('type', 'class'));
-		return '<input type="submit" class="form-submit'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
+		return '<input type="submit" class="form-submit'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
 	}
 	
 	public static function buttonTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = uniqid(); 
 		$attributes = self::getAdditionalAttributes($args, array('type', 'class'));
-		return '<input type="button" class="form-submit'.(key_exists('class', $args) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
+		return '<input type="button" class="form-submit'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'/>';
 	}
 	
 	public static function setObject($args = array(), $innerXML = '') {
