@@ -1,6 +1,6 @@
-Cavatina Source Code
+Toasty Source Code
 ********************
 
-Cavatina is a templating engine for PHP, and is in a very early stage at the moment.  It is subject to change frequently.
+Toasty is a templating engine for PHP, and is in a very early stage at the moment.  It is subject to change frequently.
 
-In order to download and use the examples, ExtJS 2.2 must be downloaded and installed under the examples/ direectory.  Then the library must be loaded in the template files.
+In order to download and use the examples, there are a few third-party js libs that are needed.  Shoot me a message and I'll pass them on.
