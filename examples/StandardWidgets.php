@@ -432,6 +432,7 @@ class StandardWidgets {
 
 	public static function textTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = 'text-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
 		$retval = '';
 		if (isset($args['label'])) {
@@ -446,6 +447,7 @@ class StandardWidgets {
 
 	public static function passwordTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = 'password-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
 		$retval = '';
 		if (isset($args['label'])) {
@@ -464,6 +466,7 @@ class StandardWidgets {
 
 	public static function selectContainer($args = array(), $innerContent = '') {
 		if (!isset($args['id'])) $args['id'] = 'select-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('label', 'class'));
 		$retval = '';
 		if (isset($args['label'])) {
@@ -484,6 +487,7 @@ class StandardWidgets {
 
 	public static function fileTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = 'file-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
 		$retval = '';
 		if (isset($args['label'])) {
@@ -498,6 +502,7 @@ class StandardWidgets {
 
 	public static function checkboxTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = 'checkbox-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('type', 'label', 'class'));
 		return '<input type="checkbox" class="form-checkbox'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.' /><label class="form-checkbox-label" for="'.$args['id'].'">'.$args['label'].'</label>';
 
@@ -514,6 +519,7 @@ class StandardWidgets {
 
 	public static function textareaContainer($args = array(), $innerContent = '') {
 		if (!isset($args['id'])) $args['id'] = 'textarea-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('class', 'label'));
 		$retval = '';
 		if (isset($args['label'])) {
@@ -528,6 +534,7 @@ class StandardWidgets {
 
 	public static function submitTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = 'submit-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('type', 'class', 'label'));
 		$retval = '';
 		if (isset($args['label'])) {
@@ -542,6 +549,7 @@ class StandardWidgets {
 
 	public static function buttonTag ($args = array()) {
 		if (!isset($args['id'])) $args['id'] = 'button-'.uniqid();
+		if (!isset($args['name'])) $args['name'] = $args['id'];
 		$attributes = self::getAdditionalAttributes($args, array('type', 'class', 'label'));
 		$retval = '';
 		if (isset($args['label'])) {
