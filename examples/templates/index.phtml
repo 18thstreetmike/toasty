@@ -14,12 +14,12 @@
 			<banner title="Sample Application Page" subtitle="Version 1.0" />
 			<nav>
 				<?php foreach($this->tabs as $link => $label) { ?>
-					<navitem url="<?= $link ?>"><?= $label ?></navitem>
+					<navitem url="<?= $link ?>" <?= ($label == 'Example 1' ? 'current="true"' : '') ?>><?= $label ?></navitem>
 				<?php } ?>
 			</nav>
 			<subnav>
 				<?php foreach($this->subnavtabs as $link => $label) { ?>
-					<navitem url="<?= $link ?>"><?= $label ?></navitem>
+					<navitem url="<?= $link ?>" <?= ($label == 'Example 1' ? 'current="true"' : '') ?>><?= $label ?></navitem>
 				<?php } ?>
 			</subnav>
 		</header>
@@ -78,20 +78,57 @@
 					</panel>
 				</column>
 			</dashboard>
-			<tree style="margin-top: 10px; height: 500px; width: 300px;">
+			<tree style="margin-top: 10px; height: 200px; width: 300px;">
 				<branch label="Branch">
 					<branch label="Child Branch" id="childbranch1" >
-						<leaf label="Leaf" id="leaf1" class="leaf" onclick="" href="http://google.com" disabled="false" />
+						<leaf label="Leaf" id="leaf1" class="leaf" href="http://google.com" disabled="false" />
 					</branch>
 				</branch>
 			</tree>
 			<grid id="data-grid" style="margin-top: 20px;">
 				<ghead>
 					<gr>
-						<gh>
+						<gh>Name</gh>
+						<gh>City</gh>
+						<gh>Gender</gh>
 					</gr>
 				</ghead>
+				<gbody>
+					<gr>
+						<gd>Mike</gd>
+						<gd>San Francisco</gd>
+						<gd>Male</gd>
+					</gr>
+					<gr>
+						<gd>Mia</gd>
+						<gd>Seattle</gd>
+						<gd>Female</gd>
+					</gr>
+					<gr>
+						<gd>Brett</gd>
+						<gd>Washington, DC</gd>
+						<gd>Male</gd>
+					</gr>
+				</gbody>
+				<gfoot>
+					<gr>
+						<gh>Name</gh>
+						<gh>Address</gh>
+						<gh>Gender</gh>
+					</gr>
+				</gfoot>
 			</grid>
+			<fieldset style="margin-top: 20px">
+				<legend>Test Form</legend>
+				<text label="Name" size="20" />
+				<password label="Password" size="20" />
+				<file label="Resume" />
+				<div class="form-element-container">
+					<checkbox label="Remember Me" />
+				</div>
+				<submit value="Submit" />
+				<button value="Button" />
+			</fieldset>
 		</content>
 		<footer>
 			<h6>Copyright 2009, 18th Street Software, LLC.</h6>

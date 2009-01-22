@@ -24,6 +24,22 @@ a {
 	color: black;
 }
 
+fieldset {
+	border: 1px #DDD solid;
+	-moz-border-radius: 3pt;
+	border-radius: 3pt;
+	padding: 2pt;
+}
+
+legend {
+	padding: 2pt;
+	margin-left: 10pt;
+}
+
+label {
+	display: block;
+}
+
 /* chrome definitions */
 div.header {
 	width: 90%;
@@ -95,7 +111,7 @@ ul.subnav li a {
 	font-weight: bold;
 }
 
-ul.subnav li.current-subnav {
+ul.subnav li.current-nav {
 	background-color: #E5F0FF;	
 }
 
@@ -123,4 +139,12 @@ div.content {
 
 br.clearer {
 	clear:both;
+}
+
+div.form-element-container {
+	padding: 2pt;
+}
+
+label.form-checkbox-label {
+	display: inline;
 }
