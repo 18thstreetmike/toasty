@@ -356,52 +356,75 @@ class Toasty {
 				if (!$this->aggregateBlocks) {
 					// replace the script blocks
 					foreach ($this->scriptBlocks as $key => $value) {
-						$output = str_replace('<script block="'.$this->hashNumber($key).'"/>', $value, $output);
-						$output = str_replace('<script block="'.$this->hashNumber($key).'"></script>', $value, $output);	
+						$output = str_replace('<tempscript block="'.$this->hashNumber($key).'"/>', $value, $output);
+						$output = str_replace('<tempscript block="'.$this->hashNumber($key).'"></tempscript>', $value, $output);
 					}
 	
 					// replace the style blocks
 					foreach ($this->styleBlocks as $key => $value) {
-						$output = str_replace('<style block="'.$this->hashNumber($key).'"/>', $value, $output);
-						$output = str_replace('<style block="'.$this->hashNumber($key).'"></style>', $value, $output);	
+						$output = str_replace('<tempstyle block="'.$this->hashNumber($key).'"/>', $value, $output);
+						$output = str_replace('<tempstyle block="'.$this->hashNumber($key).'"></tempstyle>', $value, $output);
 					}
 				} else {
+					// grab all the new scripts and styles from the page
+					$output = preg_replace_callback(
+						'/(<script[ \t>].*?\/script>)/sm',
+						array(&$this, storeScriptBlock),
+						$output
+					);
+
+					$output = preg_replace_callback(
+						'/(<style[ \t>].*?\/style>)/sm',
+						array(&$this, storeStyleBlock),
+						$output
+					);
+
+
 					// iterate over each of the scripts and styles, building strings
 					$styleString = '';
-					$scriptString = '';
+					$scriptString = '
+	function toastyInit() {
+		';
 					
 					foreach($this->scriptBlocks as $key => $code) {
 						// determine if the script block is a src=" block.  do the regular thing if it is. Let's regex this soonish.
 						if (strstr($code, 'src="') == false) {
 							$scriptString .= "// start block ".$key."\n\n". strip_tags($code) . "\n\n// end block ".$key." \n\n";
-							$output = str_replace('<script block="'.$this->hashNumber($key).'"/>', '', $output);
-							$output = str_replace('<script block="'.$this->hashNumber($key).'"></script>', '', $output);
+							$output = str_replace('<tempscript block="'.$this->hashNumber($key).'"/>', '', $output);
+							$output = str_replace('<tempscript block="'.$this->hashNumber($key).'"></tempscript>', '', $output);
 						} else {
-							$output = str_replace('<script block="'.$this->hashNumber($key).'"/>', $code, $output);
-							$output = str_replace('<script block="'.$this->hashNumber($key).'"></script>', $code, $output);
+							$output = str_replace('<tempscript block="'.$this->hashNumber($key).'"/>', $code, $output);
+							$output = str_replace('<tempscript block="'.$this->hashNumber($key).'"></tempscript>', $code, $output);
 						}
 					}
 					
 					foreach($this->styleBlocks as $key => $style) {
 						$styleString .= "/* start block ".$key." */\n\n". strip_tags($style) . "\n\n/* end block ".$key." */\n\n";
-						$output = str_replace('<style block="'.$this->hashNumber($key).'"/>', '', $output);
-						$output = str_replace('<style block="'.$this->hashNumber($key).'"></style>', '', $output);
+						$output = str_replace('<tempstyle block="'.$this->hashNumber($key).'"/>', '', $output);
+						$output = str_replace('<tempstyle block="'.$this->hashNumber($key).'"></tempstyle>', '', $output);
 					}
-					
+
+					// finish up the onload
+					$scriptString .= '
+		}
+		window.onload = toastyInit;
+';
+
+
 					if ($this->createFiles) {
 						// save the scripts and styles to external files, write these to the script and style tag locations, if specified
 						if (!empty($this->scriptTag)) {
-							if (!file_exists($_SERVER['DOCUMENT_ROOT'].$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.js')) {
+							if (is_null($this->cacheDirectory) || !file_exists($_SERVER['DOCUMENT_ROOT'].$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.js')) {
 								file_put_contents($_SERVER['DOCUMENT_ROOT'].$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.js', $scriptString);
 							}
-							$output = str_replace('<'.$this->scriptTag.' />', '<script language="javascript" type="text/javascript" src="'.$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.js'.'"></script>', $output);
+							$output = str_replace('<'.$this->scriptTag.'/>', '<script language="javascript" type="text/javascript" src="'.$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.js'.'"></script>', $output);
 							$output = str_replace('<'.$this->scriptTag.'></'.$this->scriptTag.'>', '<script language="javascript" type="text/javascript" src="'.$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.js'.'"></script>', $output);
 						}
 						if (!empty($this->styleTag)) {
-							if (!file_exists($_SERVER['DOCUMENT_ROOT'].$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.css')) {
+							if (is_null($this->cacheDirectory) || !file_exists($_SERVER['DOCUMENT_ROOT'].$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.css')) {
 								file_put_contents($_SERVER['DOCUMENT_ROOT'].$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.css', $styleString);
 							}
-							$output = str_replace('<'.$this->styleTag.' />', '<link href="'.$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.css'.'" rel="stylesheet" type="text/css" media="screen"/>', $output);
+							$output = str_replace('<'.$this->styleTag.'/>', '<link href="'.$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.css'.'" rel="stylesheet" type="text/css" media="screen"/>', $output);
 							$output = str_replace('<'.$this->styleTag.'></'.$this->styleTag.'>', '<link href="'.$this->workingDirectory.$templateName.(is_null($cacheKey) ? '' : '_'.$cacheKey).'.css'.'" rel="stylesheet" type="text/css" media="screen"/>', $output);
 						}
 					} else {
@@ -448,7 +471,7 @@ class Toasty {
 	 */
 	private function storeScriptBlock($matches) {
 		$this->scriptBlocks[] = $matches[0];
-		return '<script block="'.$this->hashNumber(count($this->scriptBlocks) - 1).'"/>';
+		return '<tempscript block="'.$this->hashNumber(count($this->scriptBlocks) - 1).'"/>';
 	}
 	
 	/**
@@ -460,7 +483,7 @@ class Toasty {
 	 */
 	private function storeStyleBlock($matches) {
 		$this->styleBlocks[] = $matches[0];
-		return '<style block="'.$this->hashNumber(count($this->styleBlocks) - 1).'"/>';
+		return '<tempstyle block="'.$this->hashNumber(count($this->styleBlocks) - 1).'"/>';
 	}
 	
 	/**
@@ -600,71 +623,90 @@ class Toasty {
 	 * @return string
 	 */
 	private function cleanHtmlCode($uncleanhtml) {
-		//Set wanted indentation
-		$indent = "    ";  
-	   	//Uses previous function to seperate tags
-	  	$fixed_uncleanhtml = $this->fixNewlinesForCleanHtml($uncleanhtml);
-	  	$uncleanhtml_array = explode("\n", $fixed_uncleanhtml);
-	  	//Sets no indentation
-	  	$indentlevel = 0;
-	  	foreach ($uncleanhtml_array as $uncleanhtml_key => $currentuncleanhtml)
-	  	{
-	  		//Removes all indentation
-	  		$currentuncleanhtml = preg_replace("/\t+/", "", $currentuncleanhtml);
-	  		$currentuncleanhtml = preg_replace("/^\s+/", "", $currentuncleanhtml);
-	  		
-	  		$replaceindent = "";
-	  		
-	  		//Sets the indentation from current indentlevel
-	  		for ($o = 0; $o < $indentlevel; $o++)
-	  		{
-	  			$replaceindent .= $indent;
-	  		}
-	  		
-	  		//If self-closing tag, simply apply indent
-	  		if (preg_match("/<(.+)\/>/", $currentuncleanhtml))
-	  		{ 
-	  			$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
-	  		}
-	  		//If doctype declaration, simply apply indent
-	  		else if (preg_match("/<!(.*)>/", $currentuncleanhtml))
-	  		{ 
-	  			$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
-	  		}
-	  		//If opening AND closing tag on same line, simply apply indent
-	  		else if (preg_match("/<[^\/](.*)>/", $currentuncleanhtml) && preg_match("/<\/(.*)>/", $currentuncleanhtml))
-	  		{ 
-	  			$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
-	  		}
-	  		//If closing HTML tag or closing JavaScript clams, decrease indentation and then apply the new level
-	  		else if (preg_match("/<\/(.*)>/", $currentuncleanhtml) || preg_match("/^(\s|\t)*\}{1}(\s|\t)*$/", $currentuncleanhtml))
-	  		{
-	  			$indentlevel--;
-	  			$replaceindent = "";
-	  			for ($o = 0; $o < $indentlevel; $o++)
-	  			{
-	  				$replaceindent .= $indent;
-	  			}
-	  			
-	  			$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
-	  		}
-	  		//If opening HTML tag AND not a stand-alone tag, or opening JavaScript clams, increase indentation and then apply new level
-	  		else if ((preg_match("/<[^\/](.*)>/", $currentuncleanhtml) && !preg_match("/<(link|meta|base|br|img|hr)(.*)>/", $currentuncleanhtml)) || preg_match("/^(\s|\t)*\{{1}(\s|\t)*$/", $currentuncleanhtml))
-	  		{
-	  			$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
-	  			
-	  			$indentlevel++;
-	  			$replaceindent = "";
-	  			for ($o = 0; $o < $indentlevel; $o++)
-	  			{
-	  				$replaceindent .= $indent;
-	  			}
-	  		}
-	  		else
-	  		//Else, only apply indentation
-	  		{$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;}
-	  	}
-	  	//Return single string seperated by newline
-	  	return implode("\n", $cleanhtml_array);	
+		try {
+			$tidyConfig = array(
+				'indent'         => true,
+				'output-xhtml'   => true,
+				'wrap-attributes' => false,
+				'wrap' => 1024,
+				'indent-cdata' => true,
+				'indent-spaces' => 4
+			);
+
+			// Tidy
+			$tidy = new tidy;
+			$tidy->parseString($uncleanhtml, $tidyConfig, 'utf8');
+			$tidy->cleanRepair();
+
+			return $tidy;
+		} catch (Exception $e) {
+
+			//Set wanted indentation
+			$indent = "   ";
+			//Uses previous function to seperate tags
+			$fixed_uncleanhtml = $this->fixNewlinesForCleanHtml($uncleanhtml);
+			$uncleanhtml_array = explode("\n", $fixed_uncleanhtml);
+			//Sets no indentation
+			$indentlevel = 0;
+			foreach ($uncleanhtml_array as $uncleanhtml_key => $currentuncleanhtml)
+			{
+				//Removes all indentation
+				$currentuncleanhtml = preg_replace("/\t+/", "", $currentuncleanhtml);
+				$currentuncleanhtml = preg_replace("/^\s+/", "", $currentuncleanhtml);
+
+				$replaceindent = "";
+
+				//Sets the indentation from current indentlevel
+				for ($o = 0; $o < $indentlevel; $o++)
+				{
+					$replaceindent .= $indent;
+				}
+
+				//If self-closing tag, simply apply indent
+				if (preg_match("/<(.+)\/>/", $currentuncleanhtml))
+				{
+					$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
+				}
+				//If doctype declaration, simply apply indent
+				else if (preg_match("/<!(.*)>/", $currentuncleanhtml))
+				{
+					$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
+				}
+				//If opening AND closing tag on same line, simply apply indent
+				else if (preg_match("/<[^\/](.*)>/", $currentuncleanhtml) && preg_match("/<\/(.*)>/", $currentuncleanhtml))
+				{
+					$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
+				}
+				//If closing HTML tag or closing JavaScript clams, decrease indentation and then apply the new level
+				else if (preg_match("/<\/(.*)>/", $currentuncleanhtml) || preg_match("/^(\s|\t)*\}{1}(\s|\t)*$/", $currentuncleanhtml))
+				{
+					$indentlevel--;
+					$replaceindent = "";
+					for ($o = 0; $o < $indentlevel; $o++)
+					{
+						$replaceindent .= $indent;
+					}
+
+					$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
+				}
+				//If opening HTML tag AND not a stand-alone tag, or opening JavaScript clams, increase indentation and then apply new level
+				else if ((preg_match("/<[^\/](.*)>/", $currentuncleanhtml) && !preg_match("/<(link|meta|base|br|img|hr)(.*)>/", $currentuncleanhtml)) || preg_match("/^(\s|\t)*\{{1}(\s|\t)*$/", $currentuncleanhtml))
+				{
+					$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;
+
+					$indentlevel++;
+					$replaceindent = "";
+					for ($o = 0; $o < $indentlevel; $o++)
+					{
+						$replaceindent .= $indent;
+					}
+				}
+				else
+				//Else, only apply indentation
+				{$cleanhtml_array[$uncleanhtml_key] = $replaceindent.$currentuncleanhtml;}
+			}
+			//Return single string seperated by newline
+			return implode("\n", $cleanhtml_array);
+		}
 	}
 }
