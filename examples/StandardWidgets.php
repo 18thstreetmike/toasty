@@ -14,6 +14,10 @@ class StandardWidgets {
 		return $attributes;
 	}
 
+	private static function clenseID($id) {
+		return str_replace('-', '_', $id);
+	}
+
 	public static function navContainer($args = array(), $innerContent = '') {
 		$attributes = self::getAdditionalAttributes($args, array('class'));
 		return '<ul class="nav'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</ul>';
@@ -380,15 +384,139 @@ class StandardWidgets {
 		if (!$args['id']) {
 			$args['id'] = 'grid-'.uniqid();
 		}
-		$reservedAttributes = array('id','class', 'label');
+		// don't ask
+		if ($args['height']) {
+			if (isset($args['style'])) {
+				$args['style'] .= '; height: '.$args['height'].'px;';
+			} else {
+				$args['style'] = 'height: '.$args['height'].'px;';
+			}
+		}
+		if ($args['width']) {
+			if (isset($args['style'])) {
+				$args['style'] .= '; width: '.$args['width'].'px;';
+			} else {
+				$args['style'] = 'width: '.$args['width'].'px;';
+			}
+		}
+		$reservedAttributes = array('id','class', 'label','height','width','striperows');
 		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
 		$retval = '<div id="'.$args['id'].'"'.$attributes.'></div>'."\n".'<script>'."\n";
 
 		// now figure out what the grid looks like
 		$xml = new SimpleXMLElement($innerXML);
+
+		$columnTypes = array();
+		$columnTypeDateFormatters = array();
+		$autoExpandIndex = 0;
+		$columnCount = 0;
+		$headJSON = '';
 		if (isset($xml->ghead)) {
-			
+			$headJSON .= '[';
+			foreach ($xml->ghead->children() as $child) {
+				if ($child->getName() == 'gr') {
+					$currentColumn = 0;
+					foreach ($child->children() as $gh) {
+						if ($gh->getName() == 'gh') {
+							if ($currentColumn != 0) {
+								$headJSON .= ',';
+							}
+							$headJSON .= "{header:'".$gh."',dataIndex:'col".$currentColumn."'";
+							foreach($gh->attributes() as $key => $value) {
+								switch($key) {
+									case 'width':
+										$headJSON .= ",width:".$value;
+										break;
+									case 'id':
+										$headJSON .= ",id:".$value;
+										break;
+									case 'sortable':
+										$headJSON .= ",sortable:".$value;
+										break;
+									case 'renderer':
+										$headJSON .= ",renderer:'".$value."'";
+										break;
+									case 'type':
+										$columnTypes[$currentColumn] = $value;
+										break;
+									case 'dateformat':
+										$columnTypeDateFormatters[$currentColumn] = $value;
+										break;
+									case 'autoexpand':
+										$autoExpandIndex = $currentColumn;
+										break;
+								}
+							}
+
+							$headJSON .= '}';
+							$currentColumn++;
+						}
+					}
+				}
+			}
+			$headJSON .= ']';
 		}
+		$columnCount = $currentColumn;
+
+		// format the body data
+		$bodyJSON = '';
+		if (isset($xml->gbody)) {
+			$bodyJSON .= '[';
+			foreach ($xml->gbody->children() as $child) {
+				if ($bodyJSON != '[') {
+					$bodyJSON .= ',';
+				}
+				if ($child->getName() == 'gr') {
+					$currentColumn = 0;
+					$bodyJSON .= '[';
+					foreach($child->children() as $gd) {
+						if ($gd->getName() == 'gd') {
+							if ($currentColumn > 0) {
+								$bodyJSON .= ',';
+							}
+							$bodyJSON .= "'".str_replace("'", "\\'", strval($gd))."'";
+							$currentColumn++;
+						}
+					}
+					$bodyJSON .= ']';
+				}
+			}
+			$bodyJSON .= ']';
+		}
+		
+		// start the output
+		$retval .= "
+			Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
+
+			var grid".self::clenseID($args['id'])."Data = ".$bodyJSON.";
+			
+			var grid".self::clenseID($args['id'])."Store = new Ext.data.SimpleStore({
+				fields: [";
+		for($i = 0; $i < $columnCount; $i++) {
+			if ($i > 0) {
+				$retval .= ',';
+			}
+			$retval .= "{name: 'col".$i."'".(isset($columnTypes[$i]) ? ",type:'".str_replace("'", "\\'", $columnTypes[$i])."'" : '')."".(isset($columnTypeDateFormats[$i]) ? ",dateFormat:'".str_replace("'", "\\'", $columnTypeDateFormats[$i])."'" : '')."}";
+		}
+		$retval .= "]
+			});
+			grid".self::clenseID($args['id'])."Store.loadData(grid".self::clenseID($args['id'])."Data);
+
+			var grid".self::clenseID($args['id'])." = new Ext.grid.GridPanel({
+				store: grid".self::clenseID($args['id'])."Store,
+				".($headJSON != '' ? "columns: ".$headJSON."," : '')."
+				stripeRows: ".($args['striperows'] ? 'true' : 'false').",
+				autoExpandColumn: 'col".$autoExpandIndex."'
+				".($args['height'] ? ",height:".$args['height'] : '')."
+				".($args['width'] ? ",width:".$args['width'] : '')."
+				".($args['label'] ? ",title:'".str_replace("'", "\\'", $args['label'])."'" : '')."
+			});
+
+		grid".self::clenseID($args['id']).".render('".$args['id']."');
+
+		grid".self::clenseID($args['id']).".getSelectionModel().selectFirstRow();
+
+		";
 
 		$retval .= '</script>';
 		return $retval;
