@@ -2,14 +2,14 @@
 	<head>
 		<title><?= $this->pageTitle ?></title>
 		<script type="text/javascript" src="scripts/StandardWidgets.js"></script> 
-		<link href="styles/ext-2.2/css/ext-all.css" media="screen" rel="stylesheet" type="text/css"/>
-		<link href="styles/ext-2.2/portal.css" media="screen" rel="stylesheet" type="text/css"/> 
-		<link href="styles/reset.css" media="screen" rel="stylesheet" type="text/css"/> 
+		<script type="text/javascript" src="scripts/dojo-1.2.3/dojo/dojo.js" djConfig="parseOnLoad: true"></script>
+		<link href="http://o.aolcdn.com/dojo/1.0.0/dijit/themes/tundra/tundra.css" media="screen" rel="stylesheet" type="text/css"/>
+		<link href="http://o.aolcdn.com/dojo/1.0.0/dojo/resources/dojo.css" media="screen" rel="stylesheet" type="text/css"/>
 		<link href="styles/style.css" media="screen" rel="stylesheet" type="text/css"/>
 		<scriptgroup />
 		<stylegroup />
 	</head>
-	<body>
+	<body class="tundra">
 		<header>
 			<banner title="Sample Application Page" subtitle="Version 1.0" />
 			<nav>
@@ -24,22 +24,21 @@
 			</subnav>
 		</header>
 		<content>
-			<panel label="" id="panel1">
+			<panel label="My Panel" id="panel1" style="width: 500px; height: 145px;">
 				<h3>Hi!</h3>
 				<p>
 					Here is some content 1.
 				</p>
 			</panel>
-			<br />
-			<p>text</p>
-			<tabs default="tab1">
+		
+			<tabs style="margin-top: 10px; width: 500px; height: 150px;">
 				<tab label="Tab 1" id="tab1">
 					<h3>Hi!</h3>
 					<p>
 						Here is some content.
 					</p>
 				</tab>
-				<tab label="Tab 2" id="tab2">
+				<tab label="Tab 2" id="tab2" selected="true">
 					<h3>Hi!</h3>
 					<p>
 						Here is some content 2.
@@ -52,31 +51,25 @@
 					</p>
 				</tab>
 			</tabs>
-			<dashboard style="width: 50%; margin-top: 10px;">
-				<column width=".3333">
-					<panel label="Panel 1" id="panel2" embed="true" collapsible="true">
-						<h3>Hi!</h3>
-						<p>
-							Here is some content 1.
-						</p>
-					</panel>
-				</column>
-				<column width=".3333">
-					<panel label="Panel 2" id="panel3" embed="true" collapsible="true">
-						<h3>Hi!</h3>
-						<p>
-							Here is some content 2.
-						</p>
-					</panel>
-				</column>
-				<column width=".3333">
-					<panel label="Panel 3" id="panel4" embed="true" collapsible="true">
-						<h3>Hi!</h3>
-						<p>
-							Here is some content 3.
-						</p>
-					</panel>
-				</column>
+			<dashboard handles="true" style="width: 50%; margin-top: 10px; border: 1px #666 solid; vertical-align: top;" zones="4">
+				<panel label="Panel 1" id="panel2" collapsible="true" style="margin: 2px;">
+					<h3>Hi!</h3>
+					<p>
+						Here is some content 1.
+					</p>
+				</panel>
+				<panel label="Panel 2" id="panel3" collapsible="true" style="margin: 2px;">
+					<h3>Hi!</h3>
+					<p>
+						Here is some content 2.
+					</p>
+				</panel>
+				<panel label="Panel 3" id="panel4" collapsible="true" style="margin: 2px;">
+					<h3>Hi!</h3>
+					<p>
+						Here is some content 3.
+					</p>
+				</panel>
 			</dashboard>
 			<tree style="margin-top: 10px; height: 200px; width: 300px;">
 				<branch label="Branch">

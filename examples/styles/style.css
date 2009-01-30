@@ -8,7 +8,13 @@ body {
 
 p {
 	text-indent: 1em;
-	padding: .25em;	
+	padding: .25em;
+	margin: 0;
+}
+
+div, h1, h2, h3, h4, h5, h6 {
+	padding: 0;
+	margin: 0;
 }
 
 ul {
@@ -55,15 +61,20 @@ div.banner {
 
 div.banner h1 {
 	font-size: 16pt;
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
 }
-div.banner h3 {
+div.banner h2 {
 	font-size: 12pt;
 	font-weight: normal;
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
 }
 
 ul.nav {
 	float: right;
 	margin-top: 3em;
+	margin-bottom: 0;
 	list-style-type: none;
 	padding: 0;	
 }
@@ -91,6 +102,7 @@ ul.nav li.current-nav {
 }
 
 ul.subnav {
+	margin: 0;
 	clear: both;
 	float: left;
 	width: 100%;

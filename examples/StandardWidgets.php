@@ -6,7 +6,9 @@ class StandardWidgets {
 	{
 		$attributes = '';
 		foreach ($args as $name => $value) {
-			if (!in_array($name, $reservedAttributes)) {
+			if (!is_array($reservedAttributes)) {
+				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
+			} else if (!in_array($name, $reservedAttributes)) {
 				$attributes .= ' '.$name.'="'.htmlentities($value).'"';
 			}
 		}
@@ -65,33 +67,20 @@ class StandardWidgets {
 		if (!$args['width'] || !is_numeric($args['width'])) {
 			$args['width'] = '300';
 		}
+		if (isset($args['current'])) {
+			$args['selectedTab'] = $args['current'];
+		}
 		$reservedAttributes = array('class', 'width', 'height', 'autoheight', 'current', 'frame', 'hideborders');
 		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
 
 		$retval = '
-			<script>
-				stdWidgetTabs = new Array();
-				stdWidgetTabContent = new Array();
+			<script type="text/javascript">
+				dojo.require("dojo.parser");
+				dojo.require("dijit.layout.ContentPane");
+				dojo.require("dijit.layout.TabContainer");
 			</script>
 		';
-		$retval .= '<div class="tabs'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</div>';
-		$retval .= "
-			<script>
-				stdWidgetActiveTab = ".($args['current'] ? "stdWidgetTabs.indexOf('".$args['current']."')" : '0').";
-
-				new Ext.TabPanel({
-					renderTo: '".$args['id']."',
-					width: ".$args['width'].",
-					".($args['plain'] && $args['plain'] == 'false' ? "plain:false," : "plain:true,")."
-					".($args['height'] && is_numeric($args['height']) ? "height: ".$args['height']."," : '')."
-					activeTab: stdWidgetActiveTab,
-					".($args['frame'] && $args['frame'] == 'true' ? "frame:true," : "frame:false,")."
-					".($args['hideborders'] && $args['hideborders'] == 'true' ? "hideBorders:true," : "hideBorders:false,")."
-					".($args['autoheight'] && $args['autoheight'] == 'true' ? 'defaults:{autoHeight: true},' : '')."
-					items: stdWidgetTabContent
-				});
-			</script>
-		";
+		$retval .= '<div dojoType="dijit.layout.TabContainer"  class="tabs'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</div>';
 		return $retval;
 	}
 
@@ -101,21 +90,14 @@ class StandardWidgets {
 			$args['id'] = 'tab-'.uniqid();
 		}
 		if (!$args['label']) {
-			$args['label'] = 'My Tab';
+			$args['title'] = 'My Tab';
+		} else {
+			$args['title'] = $args['label'];
 		}
-		$reservedAttributes = array('id', 'label');
+		$reservedAttributes = array('label');
 		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
 
-		$retval = "
-			<script>
-				stdWidgetTabs[stdWidgetTabs.length] = '".$args['id']."';
-				stdWidgetTabContent[stdWidgetTabContent.length] = {
-					title:'".str_replace("'", "\\'",$args['label'])."',
-					html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."'),
-					cls: 'tab-heading'
-				};
-			</script>
-		";
+		$retval = '<div dojoType="dijit.layout.ContentPane"'.$attributes.'>'.$innerContent.'</div>';
 		return $retval;
 	}
 
@@ -125,42 +107,21 @@ class StandardWidgets {
 			$args['id'] = 'panel-'.uniqid();
 		}
 		if (!$args['label']) {
-			$args['label'] = 'Untitled Panel';
-		}
-		if (!$args['width']) {
-			$args['width'] = '300';
-		}
-		if (!$args['embed'] || !$args['embed'] == 'true') {
-			$args['embed'] = false;
+			$args['title'] = 'Untitled Panel';
 		} else {
-			$args['embed'] = true;
+			$args['title'] = $args['label'];
 		}
-		$reservedAttributes = array('id','label', 'width', 'collapsible', 'embed', 'class');
+		$reservedAttributes = array('label', 'class');
 		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
 
-		if (!$args['embed']) {
-			$retval = '<div id="'.$args['id'].'"'.$attributes.'></div><script>';
-			$retval .= "    new Ext.Panel({
-							title: '".htmlentities($args['label'])."',
-							".($args['collapsible'] && $args['collapsible'] == 'true' ? 'collapsible:true,' : 'collapsible: false,')."
-							".($args['class'] ? "cls: '".str_replace("'", "\\'", $args['class'])."'," : '')."
-												renderTo: '".$args['id']."',
-							width:".$args['width'].",
-							html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."')
-						})
-					";
-			$retval .= ';</script>';
-		} else {
-			$retval .= "  ,{
-							title: '".htmlentities($args['label'])."',
-							".($args['collapsible'] && $args['collapsible'] == 'true' ? 'collapsible:true,' : 'collapsible: false,')."
-												".($args['class'] ? "cls: '".str_replace("'", "\\'", $args['class'])."'," : '')."
-												width:".$args['width'].",
-							html: html_entity_decode('".htmlentities(str_replace("\n", '', str_replace('\'', "\\'", $innerContent)))."')
-						}
-					";
-		}
-
+		$retval = '
+			<script type="text/javascript">
+				dojo.require("dojo.parser");
+				dojo.require("dijit.TitlePane");
+			</script>
+		';
+		$retval .= '
+			<div dojoType="dijit.TitlePane" class="panel'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</div>';
 		return $retval;
 	}
 
@@ -168,55 +129,33 @@ class StandardWidgets {
 		if (!$args['id']) {
 			$args['id'] = 'dashboard-'.uniqid();
 		}
-		$reservedAttributes = array('id','margins');
+		if (!$args['handles']) {
+			$args['handles'] = 'true';
+		}
+		if (!$args['resizable']) {
+			$args['resizable'] = 'false';
+		}
+		if (!$args['autoscroll']) {
+			$args['autoscroll'] = 'true';
+		}
+		if (!$args['opacity']) {
+			$args['opacity'] = '0.7';
+		}
+		if (!$args['zones']) {
+			$args['zones'] = '3';
+		}
+		$reservedAttributes = array('class', 'handles', 'resizable', 'autoscroll', 'opacity', 'zones');
 		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
 
-		$retval .= '<div id="'.$args['id'].'"'.$attributes.'></div>';
-		$retval .= '<script>'."\n";
-		$retval .= 'var stdWidgetColumns = new Array();'."\n";
-		$retval .= '</script>'."\n";
-		$retval .= $innerContent;
-		$retval .= "<script>\n";
-		$retval .= "
-			new Ext.Panel({
-				cls: 'dashboard',
-				renderTo: '".$args['id']."',
-				autoHeight: true,
-				border: false,
-				items: [{
-					xtype:'portal',
-					".($args['margins'] ? "margins:'".str_replace("'", "\\'", $args['margins'])."'," : '')."
-					items: stdWidgetColumns
-				}]
-			});
-			stdWidgetColumns = new Array();
-		";
-		$retval .= '</script>';
-		return $retval;
-	}
-
-	public static function columnContainer($args = array(), $innerContent = '') {
-		if (!$args['width'] || !is_numeric($args['width'])) {
-			$args['width'] = '1';
-		}
-		$retval = "
-			<script>
-				var stdWidgetColumnElements = new Array();
-				stdWidgetColumnElements = [ false
-					".$innerContent."
-				];
-				stdWidgetColumnElements.shift();
-				stdWidgetColumns[stdWidgetColumns.length] = {
-										".($args['id'] ? "id: '".str_replace("'", "\\'", $args['id'])."'," : '')."
-					".($args['class'] ? "cls: '".str_replace("'", "\\'", $args['class'])."'," : '')."
-										border: false,
-					columnWidth: ".$args['width'].",
-					".($args['style'] ? "style: '".str_replace("'", "\\'", $args['style'])."'," : '')."
-					items: stdWidgetColumnElements
-				};
-				var stdWidgetColumnElements = new Array();
+		$retval = '
+			<script type="text/javascript">
+				dojo.require("dojo.parser");
+				dojo.require("dojox.layout.GridContainer");
 			</script>
-		";
+		';
+
+		$retval .= '<div dojoType="dojox.layout.GridContainer" nbZones="'.$args['zones'].'" opacity="0.7" allowAutoScroll="'.$args['autoscroll'].'" hasResizableColumns="'.$args['resizable'].'" withHandles="'.$args['handles'].'" acceptTypes="dijit.layout.ContentPane, dijit.TitlePane" class="dashboard'.(isset($args['class']) ? ' '.$args['class'] : '').'"'.$attributes.'>'.$innerContent.'</div>';
+
 		return $retval;
 	}
 
@@ -227,7 +166,70 @@ class StandardWidgets {
 		$reservedAttributes = array('id','class');
 		$attributes = self::getAdditionalAttributes($args, $reservedAttributes);
 
-		$retval = '<div id="'.$args['id'].'"'.$attributes.'></div>'."\n".'<script>'."\n";
+		$retval = '
+			<script  type="text/javascript">
+				dojo.require("dojo.data.ItemFileReadStore");
+				dojo.require("dijit.Tree");
+				dojo.require("dojo.parser");
+			</script>
+		';
+
+		$xml = new SimpleXMLElement($innerXML);
+		$itemsString = '<div class="dojo-Tree">';
+		foreach ($xml->children() as $child) {
+			// initialize based on node type
+			if ($child->getName() == 'leaf') {
+				$itemsString .= '{leaf:true';
+				$className = 'tree-leaf';
+			} else {
+				$itemsString .= '{leaf:false';
+				$className = 'tree-branch';
+			}
+
+			// do all of the parts that aren't node specific
+			foreach ($child->attributes() as $name => $value) {
+				switch ($name) {
+					case 'class':
+						$className = $value;
+						break;
+					case 'id':
+						$itemsString .= ",id:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'href':
+						$itemsString .= ",href:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'target':
+						$itemsString .= ",hrefTarget:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'icon':
+						$itemsString .= ",icon:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'label':
+						$itemsString .= ",text:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'title':
+						$itemsString .= ",qtip:'".str_replace("'", "\\'", $value)."'";
+						break;
+					case 'disabled':
+						$itemsString .= ",disabled:".($value == "true" ? 'true' : 'false');
+						break;
+					case 'onclick':
+						$itemsString .= ",listeners:{'click':function(){".$value."},scope:this}";
+						break;
+				}
+			}
+			$itemsString .= ",cls:'".$className."'";
+
+			// finalize based on node type
+			if ($child->getName() == 'leaf') {
+				$itemsString .= '}';
+			} else {
+				$itemsString .= ',children:['.self::treeRecursionHelper($child).']}';
+			}
+		}
+		$itemsString .= ']';
+
+		$retval .= '<div id="'.$args['id'].'"'.$attributes.'></div>'."\n".'<script>'."\n";
 		$xml = new SimpleXMLElement($innerXML);
 		$itemsString = '[';
 		$firstFlag = true;
